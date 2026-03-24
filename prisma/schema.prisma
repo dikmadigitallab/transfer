@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+model Area {
+  id        String   @id @default(uuid())
+  nome      String
+  necessidades Necessidade[]
+  pessoas       Pessoa[]
+}
+
+model Funcao {
+  id    String @id @default(uuid())
+  nome  String
+  pessoas        Pessoa[]
+  necessidades   Necessidade[]
+}
+
+model Pessoa {
+  id        String  @id @default(uuid())
+  nome      String
+  areaId    String
+  funcaoId  String
+  area      Area    @relation(fields: [areaId], references: [id])
+  funcao    Funcao  @relation(fields: [funcaoId], references: [id])
+}
+
+model Necessidade {
+  id        String @id @default(uuid())
+  areaId    String
+  funcaoId  String
+  minimo    Int
+  area      Area   @relation(fields: [areaId], references: [id])
+  funcao    Funcao @relation(fields: [funcaoId], references: [id])
+}
