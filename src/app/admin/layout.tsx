@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
-//import "../globals.css";
+import "./globals.css";
+import Header from "./components/header";
+import { Sidebar } from "./components/admin-sidebar";
+
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,11 +17,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={` h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
+    < >
+<Header/>
+<Sidebar/>
+      <div className="min-h-full flex flex-col">{children}</div>
+    </>
   );
 }
