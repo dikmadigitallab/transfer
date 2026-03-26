@@ -6,36 +6,88 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  GESTOR
+  OPERADOR
+}
 
+enum StatusPessoa {
+  ATIVO
+  OCIOSO
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  sobrenome String
+  email     String   @unique
+  senha     String
+  role      Role     @default(OPERADOR)
+  createdAt DateTime @default(now())
+  movimentacoes Movimentacao[]
+}
 
 model Area {
-  id        String   @id @default(uuid())
-  nome      String
-  necessidades Necessidade[]
-  pessoas       Pessoa[]
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  alocacoes    Alocacao[]
+  necessidades NecessidadeArea[]
 }
 
 model Funcao {
-  id    String @id @default(uuid())
-  nome  String
-  pessoas        Pessoa[]
-  necessidades   Necessidade[]
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  pessoas      Pessoa[]
+  necessidades NecessidadeArea[]
 }
 
 model Pessoa {
-  id        String  @id @default(uuid())
-  nome      String
-  areaId    String
+  id        String        @id @default(cuid())
+  name      String
+  status    StatusPessoa  @default(ATIVO)
   funcaoId  String
-  area      Area    @relation(fields: [areaId], references: [id])
-  funcao    Funcao  @relation(fields: [funcaoId], references: [id])
+  createdAt DateTime      @default(now())
+
+  funcao         Funcao         @relation(fields: [funcaoId], references: [id])
+  alocacao       Alocacao?
+  movimentacoes  Movimentacao[]
 }
 
-model Necessidade {
-  id        String @id @default(uuid())
+model Alocacao {
+  id        String   @id @default(cuid())
+  pessoaId  String   @unique
   areaId    String
-  funcaoId  String
-  minimo    Int
-  area      Area   @relation(fields: [areaId], references: [id])
-  funcao    Funcao @relation(fields: [funcaoId], references: [id])
+  createdAt DateTime @default(now())
+
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id])
+  area   Area   @relation(fields: [areaId], references: [id])
+}
+
+model NecessidadeArea {
+  id               String @id @default(cuid())
+  areaId           String
+  funcaoId         String
+  quantidadeMinima Int
+
+  area   Area   @relation(fields: [areaId], references: [id])
+  funcao Funcao @relation(fields: [funcaoId], references: [id])
+
+  @@unique([areaId, funcaoId])
+}
+
+model Movimentacao {
+  id            String   @id @default(cuid())
+  pessoaId      String
+  areaOrigemId  String
+  areaDestinoId String
+  userId        String
+  createdAt     DateTime @default(now())
+
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 }
